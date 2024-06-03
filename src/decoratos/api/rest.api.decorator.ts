@@ -11,6 +11,9 @@ import {
   ExecutionContext,
 } from './param.custom.decorator';
 import { Interceptor } from './interceptor.decorator';
+import { globSync } from 'glob';
+import * as path from 'path';
+import importSync from 'import-sync';
 
 function errorHandler(
   err: any,
@@ -41,11 +44,39 @@ function errorHandler(
   }
 }
 
-export function RestConfig<T extends ClassConstructor>(
-  controllers: ClassConstructor[],
-) {
+const controllers: ClassConstructor[] = [];
+
+function controllerScan() {
+  // Tìm tất cả các file có phần mở rộng .ts trong thư mục src
+  const files: string[] = globSync(
+    path.join(__dirname, '../../../src/**/*.ts'),
+  );
+  // Import và khởi tạo các class có @RestController
+  for (const file of files) {
+    const filePath = path.resolve(file);
+    let module = null;
+    try {
+      module = importSync(filePath);
+    } catch (error) {
+      continue;
+    }
+    for (const key in module) {
+      if (module.hasOwnProperty(key)) {
+        const exportedClassController = module[key];
+        if (Reflect.getMetadata('restcontroller', exportedClassController)) {
+          console.log(`Initializing controller: ${filePath}`);
+          console.log(exportedClassController);
+          controllers.push(exportedClassController);
+        }
+      }
+    }
+  }
+}
+
+export function RestConfig<T extends ClassConstructor>() {
   return function decorator(constructor: T) {
     singleton()(constructor);
+    controllerScan();
     const rootRoute: any = container.resolve(constructor);
     controllers.forEach((controller) => {
       rootRoute
@@ -81,6 +112,8 @@ async function getMethodParams(
 export function RestController<T extends ClassConstructor>(path: string) {
   return function decorator(constructor: T) {
     injectable()(constructor);
+
+    Reflect.defineMetadata('restcontroller', true, constructor);
 
     constructor.prototype.route = express.Router();
     constructor.prototype.path = path;
