@@ -7,34 +7,15 @@ import { AuthenCheckGuard } from '../guards/authen.check.guard';
 import { AllMoviesRoute } from './all.movies.route';
 import { MovieDetailRoute } from './movie.detail.route';
 import { RestConfig } from '../decoratos/api/rest.api.decorator';
-import { ReviewRestController } from '../apis/review.api.controller';
-import { MovieRestController } from '../apis/movie.api.controller';
 import { PersonalInfoController } from '../controllers/personal.info.controller';
-import { UserRestController } from '../apis/user.api.controller';
 import { HistoryOrderController } from '../controllers/history.order.controller';
-import { BillRestController } from '../apis/bill.api.controller';
 import { csrfProtection } from '../security/csrf.protection.middleware';
 import { BookingRoute } from './booking.route';
-import { ScheduleRestController } from '../apis/schedule.api.controller';
-import { FoodRestController } from '../apis/food.api.controller';
 import { PaymentResultController } from '../controllers/payment.result.controller';
 import { AdminRoute } from './admin.route';
 import { AdminCheckGuard } from '../guards/admin.check.guard';
-import { AdminHomeRestController } from '../apis/admin/admin.home.api';
-import { AdminManageMovieRestController } from '../apis/admin/admin.manage-movie.api';
-import { TicketRestController } from '../apis/ticket.api.controller';
 
-@RestConfig([
-  ReviewRestController,
-  MovieRestController,
-  UserRestController,
-  BillRestController,
-  ScheduleRestController,
-  FoodRestController,
-  AdminHomeRestController,
-  AdminManageMovieRestController,
-  TicketRestController,
-])
+@RestConfig()
 export class RootRoute extends BaseRoute {
   constructor(
     @inject(AuthenCheckGuard)

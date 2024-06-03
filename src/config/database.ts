@@ -33,6 +33,8 @@ let dataBaseConfig: DataSourceOptions = {
 
 process.env.NODE_ENV = process.env.NODE_ENV.toUpperCase();
 
+console.log('>>> NODE_ENV:', process.env.NODE_ENV);
+
 switch (process.env.NODE_ENV) {
   case AppEnvironmentConfig.DEV:
     dataBaseConfig = {

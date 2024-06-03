@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.32
+    restart: always
+    environment:
+      - MYSQL_PASSWORD=12345678
+      - MYSQL_ROOT_PASSWORD=12345678
+    ports:
+      - "3307:3306"
+    networks:
+      - my_network
+    volumes:
+      - /home/deploy/mysql:/var/lib/mysql
+  
+  backend:
+    image: bookingcinematicket
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    networks:
+      - my_network
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=12345678
+      - DB_NAME=bookingmovieticket
+      - DB_TEST_NAME=bookingmovieticket_test
+
+      - HOST=0.0.0.0
+      - PORT=3000
+      - PROTOCOL=http
+
+      - NODE_ENV=DEV
+
+      - USER_PASSWORD_SALT_ROUND=10
+      - USER_IMAGE_REAL_PATH=public/img/user
+      - USER_IMAGE_PUBLIC_PATH=img/user
+
+      - SESSION_SECRET_KEY=sunasterisksessionbookingcinematicketsecretkey
+
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=465
+      - EMAIL_HOST_USER=anhnam2730@gmail.com
+      - EMAIL_HOST_PASSWORD=nngxplqdqheimfoi
+
+      - FORGOT_PASSWORD_SECRET=sunasteriskforgotpassword123@@@
+      # 10m
+      - FORGOT_PASSWORD_LINK_EXPIRED=600000
+
+      - REVIEW_LIMIT_TIME=259200000
+
+      #5MB
+      - IMAGE_FILE_SIZE=5242880
+
+      - BOOKING_TIMMER=599
+
+      - SCHEDULE_ADD_TIME_SQL=01:00:00
+      - SCHEDULE_ADD_TIME=3600000
+
+      #vnpay config
+      - vnp_TmnCode=CCHTW8QO
+      - vnp_HashSecret=ZCKQUHJMHTGXPVWMXNHNQORVJSQJGBOJ
+      - vnp_Url=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+      - vnp_ReturnUrl=http://localhost:3000/payment-result
+      #vnp_OrderInfo=vnpay
+      - vnp_OrderType=190001
+      - vnp_Version=2.1.0
+      - vnp_Command=pay
+
+      #momo config
+      - momo_PartnerCode=MOMOBKUN20180529
+      - momo_AccessKey=klm05TvNBzhg7h7j
+      - momo_SecretKey=at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa
+      #momo_OrderInfo=ATM_With_MoMo
+      - momo_RedirectUrl=http://localhost:3000/payment-result
+      - momo_IpnUrl=https://c63c-2405-4802-4be-b210-68b5-663e-635-8ef9.ngrok-free.app
+      - momo_RequestType=payWithATM
+      - momo_PartnerName=Test
+      - momo_StoreId=MomoTestStore
+      - momo_PaymentMomoUrl=https://test-payment.momo.vn/v2/gateway/api/create
+
+      - ADMIN_STATISTIC_MOVIE_LIMIT=10
+      - ADMIN_STATISTIC_MOVIE_TIME_LIMIT=30
+
+      # movie image path
+      - LARGE_IMAGE_REAL_PATH=public/img/movie/large
+      - SMALL_IMAGE_REAL_PATH=public/img/movie/small
+      - LARGE_IMAGE_PUBLIC_PATH=img/movie/large
+      - SMALL_IMAGE_PUBLIC_PATH=img/movie/small
+
+networks:
+  my_network:
+
